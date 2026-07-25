@@ -23,6 +23,9 @@ namespace TargetConditions {
         if (a_target->IsGhost()) { return false; }
         if (a_target->IsInKillMove()) { return false; }
 
+        bool bAllowTargetsInCombat = Settings::GetSingleton()->bAllowTargetsInCombat;
+        if (a_target->IsInCombat() && !bAllowTargetsInCombat) { return false; }
+
         auto avOwner = a_target->AsActorValueOwner();
         if (avOwner) {
             if (avOwner->GetActorValue(RE::ActorValue::kInvisibility) > 0.0f) { return false; }

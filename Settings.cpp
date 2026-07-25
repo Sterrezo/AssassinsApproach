@@ -32,6 +32,9 @@ void Settings::Load() {
 	iMaximumDetectionValue = static_cast<int>(ini.GetLongValue("Assassination Conditions", "iMaximumDetectionValue", -11));
 	ini.SetLongValue("Assassination Conditions", "iMaximumDetectionValue", iMaximumDetectionValue, "; Prevent assassinations if the target's detection is higher than this value | Default: -11");
 
+	bAllowTargetsInCombat = ini.GetBoolValue("Target Conditions", "bAllowTargetsInCombat", false);
+    ini.SetBoolValue("Target Conditions", "bAllowTargetsInCombat", bAllowTargetsInCombat, "; Allow assassinations on targets in combat | Default: false");
+
 	bAllowSittingTargets = ini.GetBoolValue("Target Conditions", "bAllowSittingTargets", true);
     ini.SetBoolValue("Target Conditions", "bAllowSittingTargets", bAllowSittingTargets, "; Allow assassinations on targets that are currently sitting | Default: true");
 

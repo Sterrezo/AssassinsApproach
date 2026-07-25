@@ -19,6 +19,7 @@ public:
     float fAssassinationDistance = 180.0f;
     float fAssassinationHeightDifference = 40.0f;
     int iMaximumDetectionValue = -10;
+    bool bAllowTargetsInCombat = false;
     bool bAllowSittingTargets = true;
     bool bAllowSleepingTargets = false;
     bool bAllowEssentialTargets = false;
