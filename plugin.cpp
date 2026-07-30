@@ -17,6 +17,38 @@ void SetupLog() {
     spdlog::flush_on(spdlog::level::trace);
 }
 
+class MenuHandler : public RE::BSTEventSink<RE::MenuOpenCloseEvent> {
+public:
+    RE::BSEventNotifyControl ProcessEvent(const RE::MenuOpenCloseEvent* a_event, RE::BSTEventSource<RE::MenuOpenCloseEvent>*) override {
+        if (a_event && !a_event->opening && a_event->menuName == RE::RaceSexMenu::MENU_NAME) {
+            if (auto player = RE::PlayerCharacter::GetSingleton()) {
+                player->AddAnimationGraphEventSink(PlayerAttackSink::GetSingleton());
+            }
+        }
+        return RE::BSEventNotifyControl::kContinue;
+    }
+    static MenuHandler* GetSingleton() {
+        static MenuHandler singleton;
+        return &singleton;
+    }
+};
+
+class EquipHandler : public RE::BSTEventSink<RE::TESEquipEvent> {
+public:
+    RE::BSEventNotifyControl ProcessEvent(const RE::TESEquipEvent* a_event, RE::BSTEventSource<RE::TESEquipEvent>*) override {
+        if (a_event && a_event->actor && a_event->actor->IsPlayerRef()) {
+            if (auto player = RE::PlayerCharacter::GetSingleton()) {
+                player->AddAnimationGraphEventSink(PlayerAttackSink::GetSingleton());
+            }
+        }
+        return RE::BSEventNotifyControl::kContinue;
+    }
+    static EquipHandler* GetSingleton() {
+        static EquipHandler singleton;
+        return &singleton;
+    }
+};
+
 SKSEPluginLoad(const SKSE::LoadInterface *skse) {
     SKSE::Init(skse);
 
@@ -37,6 +69,11 @@ SKSEPluginLoad(const SKSE::LoadInterface *skse) {
             } else {
                 logger::info("Perk missing, leaving it as nullptr");
             }
+
+            RE::UI::GetSingleton()->AddEventSink(MenuHandler::GetSingleton());
+            if (auto equipSource = RE::ScriptEventSourceHolder::GetSingleton()) {
+                equipSource->AddEventSink(EquipHandler::GetSingleton());
+            }
         }
 
         if ((message->type == SKSE::MessagingInterface::kPostLoadGame) || (message->type == SKSE::MessagingInterface::kNewGame)) {
@@ -45,8 +82,7 @@ SKSEPluginLoad(const SKSE::LoadInterface *skse) {
                 return;
             }
 
-            auto player = RE::PlayerCharacter::GetSingleton();
-            if (player) {
+            if (auto player = RE::PlayerCharacter::GetSingleton()) {
                 player->AddAnimationGraphEventSink(PlayerAttackSink::GetSingleton());
                 logger::info("Player attack event sink registered");
             }
